@@ -69,6 +69,7 @@ public class Function
                     };
 
                 default:
+
                     return new APIGatewayHttpApiV2ProxyResponse
                     {
                         StatusCode = 405,
