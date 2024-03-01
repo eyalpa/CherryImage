@@ -5,6 +5,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { FileListComponent } from './file-list/file-list.component';
+
 import { FileUploadComponent } from './file-upload/file-upload.component';
 import { ThreeViewerComponent } from './three-viewer/three-viewer.component';
 
@@ -13,13 +14,10 @@ import { ThreeViewerComponent } from './three-viewer/three-viewer.component';
     AppComponent,
     FileListComponent,
     FileUploadComponent,
-    ThreeViewerComponent
+    ThreeViewerComponent,
   ],
-  imports: [
-    BrowserModule, HttpClientModule,
-    AppRoutingModule
-  ],
+  imports: [BrowserModule, HttpClientModule, AppRoutingModule],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

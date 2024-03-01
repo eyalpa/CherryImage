@@ -1,5 +1,7 @@
-<ul>
-  <li *ngFor="let file of files" (click)="onFileSelect(file)">
-    {{ file }}
-  </li>
-</ul>
+<div>
+  <label for="fileSelect">Choose a file:</label>
+  <select id="fileSelect" (change)="onFileSelect($event)">
+    <option value="">Select a file</option>
+    <option *ngFor="let file of files" [value]="file">{{ file }}</option>
+  </select>
+</div>

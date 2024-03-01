@@ -7,19 +7,39 @@ import { Observable } from 'rxjs';
 })
 export class S3Service {
   private apiUrl =
-    'https://p34k546geh.execute-api.us-east-1.amazonaws.com/default/CherryImage';
+    'https://bzhhof9s36.execute-api.us-east-1.amazonaws.com/PROD/CherryImageNodeJS';
 
   constructor(private http: HttpClient) {}
 
-  listFiles(): Observable<string[]> {
-    return this.http.get<string[]>(`${this.apiUrl}/`);
+  listFiles(): Observable<S3File[]> {
+    return this.http.get<S3File[]>(`${this.apiUrl}`);
   }
 
-  getPresignedUrl(fileKey: string): Observable<any> {
-    return this.http.get(`${this.apiUrl}/presigned-url?objectKey=${fileKey}`);
+  getPresignedUrl(fileKey: string): Observable<PresignedUrlResponse> {
+    return this.http.get<PresignedUrlResponse>(
+      `${this.apiUrl}?file=${fileKey}`
+    );
   }
 
-  uploadFile(fileContent: Blob, presignedUrl: string): Observable<any> {
-    return this.http.put(presignedUrl, fileContent);
+  uploadFile(file: File): Observable<any> {
+    const formData: FormData = new FormData();
+    formData.append('file', file, file.name);
+
+    return this.http.post(`${this.apiUrl}?file=${file.name}`, formData, {
+      reportProgress: true,
+      observe: 'events',
+    });
   }
+}
+
+export interface S3File {
+  Key: string;
+  LastModified: string;
+  ETag: string;
+  Size: number;
+  StorageClass: string;
+}
+
+export interface PresignedUrlResponse {
+  PreSignedUrl: string;
 }

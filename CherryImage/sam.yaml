@@ -1,0 +1,36 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: An AWS Serverless Application Model template describing your function.
+
+Resources:
+  CherryImageFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: CherryImage::CherryImage.Function::FunctionHandler
+      Runtime: dotnet6 # Ensure this matches your Lambda's runtime; .NET 8 is not valid
+      MemorySize: 512
+      Timeout: 30
+      Architectures:
+        - x86_64
+      EphemeralStorage:
+        Size: 512
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action: "lambda:*"
+              Resource: "*"
+          # Include any specific policies your Lambda function needs.
+          # The provided policy statements are quite broad; consider specifying more restrictive permissions.
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /cherryimage
+            Method: any # Use "any" to allow all HTTP methods or specify one, like "get" or "post".
+
+Globals:
+  Api:
+    Cors:
+      AllowMethods: "'*'"
+

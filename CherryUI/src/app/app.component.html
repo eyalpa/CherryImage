@@ -2,7 +2,10 @@
   <h1>3D File Manager</h1>
   <!-- File List Component -->
   <app-file-list (fileSelected)="onFileSelected($event)"></app-file-list>
+  <app-file-upload ></app-file-upload>
+
   <!-- Three.js Viewer Component -->
+<br>
   <!-- Ensure the modelUrl input binds to the modelUrl property of the AppComponent -->
   <app-three-viewer [modelUrl]="modelUrl"></app-three-viewer>
 </div>

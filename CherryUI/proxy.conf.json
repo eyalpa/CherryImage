@@ -1,0 +1,20 @@
+{
+  "/api/*": {
+    "secure": false,
+    "target": "https://bzhhof9s36.execute-api.us-east-1.amazonaws.com",
+    "changeOrigin": true,
+    "logLevel": "debug",
+    "pathRewrite": {
+      "^/api": "/PROD/CherryImageNodeJS"
+    }
+  },
+  "/s3/*": {
+    "target": "https://cherryi.s3.us-east-1.amazonaws.com",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug",
+    "pathRewrite": {
+      "^/s3": "/"
+    }
+  }
+}
