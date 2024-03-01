@@ -1,18 +1,24 @@
+# This AWS SAM template has been generated from your function's configuration. If
+# your function has one or more triggers, note that the AWS resources associated
+# with these triggers aren't fully specified in this template and include
+# placeholder values. Open this template in AWS Application Composer or your
+# favorite IDE and modify it to specify a serverless application with other AWS
+# resources.
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: An AWS Serverless Application Model template describing your function.
 Resources:
-  CherryImage:
+  CherryImageNodeJS:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: .
       Description: ''
-      MemorySize: 512
-      Timeout: 30
-      Handler: CherryImage::CherryImage.Function::FunctionHandler
-      Runtime: dotnet8
+      MemorySize: 128
+      Timeout: 3
+      Handler: index.handler
+      Runtime: nodejs20.x
       Architectures:
-        - x86_64
+        - arm64
       EphemeralStorage:
         Size: 512
       EventInvokeConfig:
@@ -80,74 +86,13 @@ Resources:
                 - logs:GetLogEvents
                 - logs:FilterLogEvents
               Resource: arn:aws:logs:*:*:log-group:/aws/lambda/*
-        - Statement:
-            - Effect: Allow
-              Action:
-                - s3:GetObject
-                - s3:GetObjectAcl
-                - s3:GetObjectLegalHold
-                - s3:GetObjectRetention
-                - s3:GetObjectTorrent
-                - s3:GetObjectVersion
-                - s3:GetObjectVersionAcl
-                - s3:GetObjectVersionForReplication
-                - s3:GetObjectVersionTorrent
-                - s3:ListBucket
-                - s3:ListBucketMultipartUploads
-                - s3:ListBucketVersions
-                - s3:ListMultipartUploadParts
-                - s3:AbortMultipartUpload
-                - s3:DeleteObject
-                - s3:DeleteObjectVersion
-                - s3:PutObject
-                - s3:PutObjectLegalHold
-                - s3:PutObjectRetention
-                - s3:RestoreObject
-              Resource:
-                - !Sub arn:${AWS::Partition}:s3:::${cherryi}
-                - !Sub arn:${AWS::Partition}:s3:::${cherryi}/*
       SnapStart:
         ApplyOn: None
+      Events:
+        Api1:
+          Type: Api
+          Properties:
+            Path: /CherryImageNodeJS
+            Method: ANY
       RuntimeManagementConfig:
         UpdateRuntimeOn: Auto
-      Events:
-        ServerlessRestApiGETCherryImage:
-          Type: Api
-          Properties:
-            Path: /CherryImage
-            Method: GET
-        ServerlessRestApiPOSTCherryImage:
-          Type: Api
-          Properties:
-            Path: /CherryImage
-            Method: POST
-      Environment:
-        Variables:
-          CHERRYI_BUCKET_NAME: !Ref cherryi
-          CHERRYI_BUCKET_ARN: !GetAtt cherryi.Arn
-  cherryi:
-    Type: AWS::S3::Bucket
-    Properties:
-      BucketName: !Sub ${AWS::StackName}-myawsbucket-${AWS::AccountId}
-      BucketEncryption:
-        ServerSideEncryptionConfiguration:
-          - ServerSideEncryptionByDefault:
-              SSEAlgorithm: aws:kms
-              KMSMasterKeyID: alias/aws/s3
-  cherryiBucketPolicy:
-    Type: AWS::S3::BucketPolicy
-    Properties:
-      Bucket: !Ref cherryi
-      PolicyDocument:
-        Id: RequireEncryptionInTransit
-        Version: '2012-10-17'
-        Statement:
-          - Principal: '*'
-            Action: '*'
-            Effect: Deny
-            Resource:
-              - !GetAtt cherryi.Arn
-              - !Sub ${cherryi.Arn}/*
-            Condition:
-              Bool:
-                aws:SecureTransport: 'false'
