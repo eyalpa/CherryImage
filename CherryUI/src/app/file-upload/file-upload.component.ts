@@ -13,7 +13,7 @@ export class FileUploadComponent {
     const file: File = event.target.files[0];
     if (file) {
       this.s3Service.uploadFile(file).subscribe(() => {
-        alert('File uploaded successfully.');
+        //alert('File uploaded successfully.');
       });
     }
   }

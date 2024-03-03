@@ -12,7 +12,7 @@
       "type": "chrome",
       "request": "launch",
       "name": "localhost (Chrome)",
-      "url": "https://localhost:4200",
+      "url": "http://localhost:4200",
       "webRoot": "${workspaceFolder}"
     }
   ]
