@@ -2,7 +2,7 @@ import {
   S3Client,
   ListObjectsV2Command,
   PutObjectCommand,
-  GetObjectCommand,
+  GetObjectCommand
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
@@ -12,27 +12,18 @@ const bucketName = "cherryi";
 
 export const handler = async (event) => {
   try {
-    const objectKey = event.queryStringParameters
-      ? event.queryStringParameters["file"]
-      : "";
+    const objectKey = event.queryStringParameters ? event.queryStringParameters["file"] : "";
     switch (event.requestContext.http.method.toUpperCase()) {
       case "GET":
-        console.info(
-          `GET : objectKey:${objectKey} event:${JSON.stringify(event)} `
-        );
-        if (
-          event.requestContext.http.path.endsWith("/CherryImageNodeJS") &&
-          objectKey === ""
-        ) {
+        console.info(`GET : objectKey:${objectKey} event:${JSON.stringify(event)} `);
+        if (event.requestContext.http.path.endsWith("/CherryImageNodeJS") && objectKey === "") {
           const fileList = await listFilesInBucket();
           return {
             statusCode: 200,
             body: JSON.stringify(fileList),
           };
         } else {
-          console.info(
-            `${JSON.stringify(event)} looking for event.pathParameters["file"] `
-          );
+          console.info(`${JSON.stringify(event)} looking for event.pathParameters["file"] `);
           const url = await generatePreSignedURL(objectKey);
           return {
             statusCode: 200,
@@ -41,10 +32,10 @@ export const handler = async (event) => {
         }
 
       case "POST":
-        console.info(`POST : objectKey:${objectKey} `);
-        const decodedBody = event.isBase64Encoded
-          ? Buffer.from(event.body, "base64")
-          : event.body;
+        console.info(`POST : objectKey:${objectKey} ,${event.isBase64Encoded} ${event.body}  `);
+        let decodedBody = event.isBase64Encoded ? Buffer.from(event.body, "base64") : event.body;
+        decodedBody = extractGLTFContent(decodedBody)
+        
         await uploadFileToBucket(objectKey, decodedBody);
         return {
           statusCode: 200,
@@ -66,6 +57,26 @@ export const handler = async (event) => {
     };
   }
 };
+function extractGLTFContent(content) {
+
+    // Identify the position where "glTF" starts. 
+    // This is critical as it marks the beginning of the actual file content.
+    const glTFPosition = content.indexOf("glTF");
+
+    if (glTFPosition !== -1) {
+        // Convert position of "glTF" in the decoded string back to bytes to handle potential multi-byte characters
+        const startPosition = content.slice(0, glTFPosition).byteLength;
+
+        // Slice the original ArrayBuffer from "glTF" to the end
+        const glTFContentArrayBuffer = content.slice(startPosition);
+
+        return glTFContentArrayBuffer;
+    } else {
+        // If "glTF" is not found, log a warning and return the original ArrayBuffer
+        console.warn("\"glTF\" marker not found. Returning original ArrayBuffer.");
+        return content;
+    }
+}
 
 async function listFilesInBucket() {
   const command = new ListObjectsV2Command({ Bucket: bucketName });
