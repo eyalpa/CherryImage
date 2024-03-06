@@ -24,7 +24,8 @@ export const handler = async (event) => {
           };
         } else {
           console.info(`${JSON.stringify(event)} looking for event.pathParameters["file"] `);
-          const url = await generatePreSignedURL(objectKey);
+          let requestMethod = event.queryStringParameters ? event.queryStringParameters["method"] : "GET";
+          const url = await generatePreSignedURL(objectKey,requestMethod);
           return {
             statusCode: 200,
             body: JSON.stringify({ PreSignedUrl: url }),
@@ -84,11 +85,20 @@ async function listFilesInBucket() {
   return response.Contents ? response.Contents.map((obj) => obj.Key) : [];
 }
 
-async function generatePreSignedURL(objectKey) {
-  const command = new GetObjectCommand({
-    Bucket: bucketName,
-    Key: objectKey,
-  });
+async function generatePreSignedURL(objectKey, method) {
+  let command;
+  if(method ==='GET'){
+     command = new GetObjectCommand({
+      Bucket: bucketName,
+      Key: objectKey,
+    });
+  }else {
+    command = new PutObjectCommand({
+      Bucket: bucketName,
+      Key: objectKey,
+    });
+  }
+  
   const url = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
   return url;
 }
